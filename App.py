@@ -1,13 +1,18 @@
+import os
+from PIL import Image
 import pandas as pd
 import streamlit as st
 from datetime import datetime
 import altair as alt
 from streamlit_autorefresh import st_autorefresh
 
+LOGO_PATH = os.path.join(os.path.dirname(__file__), "logo.webp")
+logo_img = Image.open(LOGO_PATH) if os.path.exists(LOGO_PATH) else None
+
 # PAGE CONFIGURATION
 st.set_page_config(
-    page_title="AUSTON ROBOT - SALES & SERVICE DASHBOARD",
-    page_icon="🤖",
+    page_title="APEX - SALES & SERVICE DASHBOARD",
+    page_icon=logo_img if logo_img else "📊",
     layout="wide"
 )
 
@@ -50,6 +55,9 @@ except (KeyError, FileNotFoundError):
 # ─────────────────────────────────────────────────────────────
 # SIDEBAR CONTROLS
 # ─────────────────────────────────────────────────────────────
+if logo_img:
+    st.sidebar.image(logo_img, width=150)
+
 st.sidebar.title("⚙️ DASHBOARD CONTROLS")
 
 auto_refresh = st.sidebar.checkbox("REAL-TIME LIVE SYNC", value=True)
@@ -149,15 +157,28 @@ df_visits_f = apply_filters(df_visits)
 df_orders_f = apply_filters(df_orders)
 
 # APP HEADER
-col_title, col_btn = st.columns([4, 1])
-with col_title:
-    st.title("🤖 AUSTON ROBOT — OPERATIONS DASHBOARD")
-    st.caption("REAL-TIME SALES PIPELINE & SERVICE MANAGEMENT SYSTEM")
-with col_btn:
-    st.write("")
-    if st.button("🔄 FORCE SYNC DATA"):
-        st.cache_data.clear()
-        st.rerun()
+if logo_img:
+    col_logo, col_title, col_btn = st.columns([1, 6, 2])
+    with col_logo:
+        st.image(logo_img, width=90)
+    with col_title:
+        st.title("APEX — OPERATIONS DASHBOARD")
+        st.caption("REAL-TIME SALES PIPELINE & SERVICE MANAGEMENT SYSTEM")
+    with col_btn:
+        st.write("")
+        if st.button("🔄 FORCE SYNC DATA"):
+            st.cache_data.clear()
+            st.rerun()
+else:
+    col_title, col_btn = st.columns([4, 1])
+    with col_title:
+        st.title("APEX — OPERATIONS DASHBOARD")
+        st.caption("REAL-TIME SALES PIPELINE & SERVICE MANAGEMENT SYSTEM")
+    with col_btn:
+        st.write("")
+        if st.button("🔄 FORCE SYNC DATA"):
+            st.cache_data.clear()
+            st.rerun()
 
 st.markdown("---")
 
@@ -215,7 +236,7 @@ with tab_sales:
         st.dataframe(pd.DataFrame(prod_sales_data), use_container_width=True, hide_index=True)
 
     with col_s2:
-        st.subheader("📊 PIPELINE STAGE BREAKDOWN")
+        st.subheader("📊 SALES UPDATE")
         stages = ["NEW", "CONTACTED", "DISCUSSION", "QUOTATION", "NEGOTIATION", "EXPECTED ORDER", "WON", "LOST"]
         p_counts = {}
         if 'ENQUIRY STATUS' in df_enquiries_f.columns and not df_enquiries_f.empty:

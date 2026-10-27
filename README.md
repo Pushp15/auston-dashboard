@@ -1,6 +1,6 @@
-# 🤖 Auston Robot — Sales & Service Operations Dashboard
+# 📊 Apex — Sales & Service Operations Dashboard
 
-A real-time business intelligence dashboard built with **Streamlit** that pulls live data from a Google Sheet to monitor sales pipelines, service operations, and engineer performance for Auston Robot.
+A real-time business intelligence dashboard built with **Streamlit** that pulls live data from a Google Sheet to monitor sales pipelines, service operations, and engineer performance for Apex.
 
 ---
 
@@ -21,7 +21,7 @@ The dashboard is split into two tabs:
 - **6 KPI Metrics** — Total Enquiries, Open Enquiries, Quotes Sent, Expected Orders, Orders Received, and Overdue Follow-Ups
 - **Sales Engineer Activity Table** — Enquiries logged and orders closed per engineer
 - **Product Sales Distribution** — Enquiries and orders broken down by product
-- **Pipeline Stage Breakdown** — Bar chart across all deal stages (New → Won/Lost)
+- **Sales Update** — Bar chart across all deal stages (New → Won/Lost)
 - **Enquiry & Follow-Up Tracker** — Full filterable data table
 
 ### Service Dashboard
@@ -131,4 +131,4 @@ Sales_Dashboard_KPIs/
 
 ## 📄 License
 
-This project is proprietary to **Auston Robot**. All rights reserved.
+This project is proprietary to **Apex**. All rights reserved.
