@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 import altair as alt
+from streamlit_autorefresh import st_autorefresh
 
 # PAGE CONFIGURATION
 st.set_page_config(
@@ -37,24 +38,50 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# ─────────────────────────────────────────────────────────────
 # GOOGLE SHEET CONFIGURATION
-SPREADSHEET_ID = "1BFFZWBHa35gZzQgTpP2NNIsMmYr06eWAb6jsXQJ1LVg"
+# Priority: Streamlit Secrets → hardcoded fallback
+# ─────────────────────────────────────────────────────────────
+try:
+    SPREADSHEET_ID = st.secrets["SPREADSHEET_ID"]
+except (KeyError, FileNotFoundError):
+    SPREADSHEET_ID = "1BFFZWBHa35gZzQgTpP2NNIsMmYr06eWAb6jsXQJ1LVg"
 
+# ─────────────────────────────────────────────────────────────
+# SIDEBAR CONTROLS
+# ─────────────────────────────────────────────────────────────
 st.sidebar.title("⚙️ DASHBOARD CONTROLS")
+
 auto_refresh = st.sidebar.checkbox("REAL-TIME LIVE SYNC", value=True)
-cache_ttl = 0 if auto_refresh else 10
+
+if auto_refresh:
+    refresh_interval = st.sidebar.select_slider(
+        "AUTO-REFRESH INTERVAL",
+        options=[30, 60, 120, 300, 600],
+        value=60,
+        format_func=lambda x: f"{x}s" if x < 60 else f"{x // 60}m"
+    )
+    # Trigger a full page rerun every N seconds automatically
+    st_autorefresh(interval=refresh_interval * 1000, limit=None, key="live_sync")
+    st.sidebar.caption(f"⏱️ AUTO-REFRESHING EVERY {refresh_interval}S")
+    cache_ttl = refresh_interval  # cache lifetime matches refresh interval
+else:
+    cache_ttl = 300  # 5-minute cache when live sync is off
+    st.sidebar.caption("🔴 LIVE SYNC DISABLED")
 
 @st.cache_data(ttl=cache_ttl)
 def load_data(sheet_name: str) -> pd.DataFrame:
     """FETCH SHEET TAB VIA PUBLIC EXPORT LINK WITH ERROR HANDLING."""
-    # Using pub?output=csv format for reliable fetching
-    url = f"https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
+    url = (
+        f"https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}"
+        f"/gviz/tq?tqx=out:csv&sheet={sheet_name}"
+    )
     try:
         df = pd.read_csv(url)
-        
+
         # Upper header names
         df.columns = [str(col).strip().upper() for col in df.columns]
-        
+
         # Remove empty columns like Unnamed
         df = df.loc[:, ~df.columns.str.contains('^UNNAMED')]
 
@@ -67,7 +94,7 @@ def load_data(sheet_name: str) -> pd.DataFrame:
         for col in df.columns:
             if "DATE" in col or "FOLLOW-UP" in col:
                 df[col] = pd.to_datetime(df[col], format='mixed', errors='coerce')
-                
+
         return df
     except Exception as e:
         st.sidebar.error(f"Error loading tab '{sheet_name}': {e}")
@@ -142,16 +169,16 @@ tab_sales, tab_service = st.tabs(["📈 SALES DASHBOARD", "🛠️ SERVICE DASHB
 # ==========================================
 with tab_sales:
     st.header("📈 SALES & ENQUIRY PERFORMANCE")
-    
+
     # SALES KPIS
     kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
-    
+
     tot_enq = len(df_enquiries_f) if not df_enquiries_f.empty else 0
     open_enq = len(df_enquiries_f[~df_enquiries_f['ENQUIRY STATUS'].astype(str).str.upper().isin(['WON', 'LOST'])]) if not df_enquiries_f.empty and 'ENQUIRY STATUS' in df_enquiries_f.columns else 0
     quotes_sent = len(df_enquiries_f[df_enquiries_f['QUOTATION STATUS'].astype(str).str.upper().isin(['SUBMITTED', 'ACCEPTED', 'REVISED'])]) if not df_enquiries_f.empty and 'QUOTATION STATUS' in df_enquiries_f.columns else 0
     exp_orders = len(df_enquiries_f[df_enquiries_f['EXPECTED ORDER'].astype(str).str.upper() == 'YES']) if not df_enquiries_f.empty and 'EXPECTED ORDER' in df_enquiries_f.columns else 0
     orders_rec = len(df_orders_f) if not df_orders_f.empty else 0
-    
+
     today = pd.to_datetime(datetime.now().date())
     overdue_fu = len(df_enquiries_f[df_enquiries_f['NEXT FOLLOW-UP'] < today]) if not df_enquiries_f.empty and 'NEXT FOLLOW-UP' in df_enquiries_f.columns else 0
 
@@ -213,7 +240,7 @@ with tab_sales:
 # ==========================================
 with tab_service:
     st.header("🛠️ SERVICE OPERATIONS & CSAT TRACKER")
-    
+
     # SERVICE KPIS
     skpi1, skpi2, skpi3, skpi4 = st.columns(4)
 
@@ -240,7 +267,7 @@ with tab_service:
             vis_cnt = len(df_visits_f[df_visits_f['ENGINEER'].astype(str).str.upper() == eng]) if 'ENGINEER' in df_visits_f.columns else 0
             o_iss = len(df_issues_f[(df_issues_f['ENGINEER'].astype(str).str.upper() == eng) & (~df_issues_f['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED']))]) if 'ENGINEER' in df_issues_f.columns and 'CURRENT STATUS' in df_issues_f.columns else 0
             r_iss = len(df_issues_f[(df_issues_f['ENGINEER'].astype(str).str.upper() == eng) & (df_issues_f['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED']))]) if 'ENGINEER' in df_issues_f.columns and 'CURRENT STATUS' in df_issues_f.columns else 0
-            
+
             serv_eng_data.append({
                 "ENGINEER": eng,
                 "VISITS COMPLETED": vis_cnt,
@@ -254,7 +281,7 @@ with tab_service:
         if not df_issues_f.empty and 'PRIORITY' in df_issues_f.columns:
             priority_counts = df_issues_f['PRIORITY'].astype(str).str.upper().value_counts().reset_index()
             priority_counts.columns = ['PRIORITY', 'COUNT']
-            
+
             chart = alt.Chart(priority_counts).mark_bar(cornerRadiusTopLeft=5, cornerRadiusTopRight=5).encode(
                 x=alt.X('PRIORITY', sort=['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
                 y='COUNT',
