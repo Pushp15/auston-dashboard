@@ -6,7 +6,9 @@ from datetime import datetime
 import altair as alt
 from streamlit_autorefresh import st_autorefresh
 
-LOGO_PATH = os.path.join(os.path.dirname(__file__), "logo.webp")
+LOGO_PATH = os.path.join(os.path.dirname(__file__), "logo.png")
+if not os.path.exists(LOGO_PATH):
+    LOGO_PATH = os.path.join(os.path.dirname(__file__), "logo.webp")
 logo_img = Image.open(LOGO_PATH) if os.path.exists(LOGO_PATH) else None
 
 # PAGE CONFIGURATION
