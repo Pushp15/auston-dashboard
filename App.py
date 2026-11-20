@@ -11,7 +11,7 @@ logo_img = Image.open(LOGO_PATH) if os.path.exists(LOGO_PATH) else None
 
 # PAGE CONFIGURATION
 st.set_page_config(
-    page_title="APEX - SERVICE OPERATIONS DASHBOARD",
+    page_title="AUSTON - SERVICE OPERATIONS DASHBOARD",
     page_icon=logo_img if logo_img else "🛠️",
     layout="wide"
 )
@@ -158,7 +158,7 @@ if logo_img:
     with col_logo:
         st.image(logo_img, width=90)
     with col_title:
-        st.title("APEX — SERVICE OPERATIONS DASHBOARD")
+        st.title("AUSTON — SERVICE OPERATIONS DASHBOARD")
         st.caption("REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT")
     with col_btn:
         st.write("")
@@ -168,7 +168,7 @@ if logo_img:
 else:
     col_title, col_btn = st.columns([4, 1])
     with col_title:
-        st.title("APEX — SERVICE OPERATIONS DASHBOARD")
+        st.title("AUSTON — SERVICE OPERATIONS DASHBOARD")
         st.caption("REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT")
     with col_btn:
         st.write("")
