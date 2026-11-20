@@ -122,7 +122,7 @@ def load_data(sheet_name: str) -> pd.DataFrame:
         df = df.loc[:, ~df.columns.str.contains('^UNNAMED')]
 
         # Clean string values
-        for col in df.select_dtypes(include='object').columns:
+        for col in df.select_dtypes(include=['object', 'string']).columns:
             df[col] = df[col].astype(str).str.strip()
             df[col] = df[col].replace({'nan': None, 'None': None, '': None})
 
@@ -249,7 +249,7 @@ with tab_sales:
                 "ENQUIRIES LOGGED": e_enq,
                 "ORDERS CLOSED": e_ord
             })
-        st.dataframe(pd.DataFrame(sales_eng_data), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(sales_eng_data), width="stretch", hide_index=True)
 
         st.subheader("📦 PRODUCT SALES DISTRIBUTION")
         prod_sales_data = []
@@ -257,7 +257,7 @@ with tab_sales:
             p_enq = len(df_enquiries_f[df_enquiries_f['PRODUCT'].astype(str).str.upper() == prod]) if 'PRODUCT' in df_enquiries_f.columns else 0
             p_ord = len(df_orders_f[df_orders_f['PRODUCT'].astype(str).str.upper() == prod]) if 'PRODUCT' in df_orders_f.columns else 0
             prod_sales_data.append({"PRODUCT": prod, "ENQUIRIES": p_enq, "ORDERS": p_ord})
-        st.dataframe(pd.DataFrame(prod_sales_data), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(prod_sales_data), width="stretch", hide_index=True)
 
     with col_s2:
         st.subheader("📊 SALES UPDATE")
@@ -275,7 +275,7 @@ with tab_sales:
 
     st.subheader("📋 RECENT ENQUIRIES & FOLLOW-UP TRACKER")
     if not df_enquiries_f.empty:
-        st.dataframe(df_enquiries_f, use_container_width=True, hide_index=True)
+        st.dataframe(df_enquiries_f, width="stretch", hide_index=True)
     else:
         st.info("NO ENQUIRY DATA AVAILABLE.")
 
@@ -319,7 +319,7 @@ with tab_service:
                 "OPEN ISSUES": o_iss,
                 "RESOLVED ISSUES": r_iss
             })
-        st.dataframe(pd.DataFrame(serv_eng_data), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(serv_eng_data), width="stretch", hide_index=True)
 
     with col_sv2:
         st.subheader("⚠️ ISSUES BY PRIORITY MATRIX")
@@ -337,6 +337,6 @@ with tab_service:
 
     st.subheader("📋 ALL CUSTOMER ISSUES LOG")
     if not df_issues_f.empty:
-        st.dataframe(df_issues_f, use_container_width=True, hide_index=True)
+        st.dataframe(df_issues_f, width="stretch", hide_index=True)
     else:
         st.info("NO CUSTOMER ISSUES DATA AVAILABLE.")
