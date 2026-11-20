@@ -1,4 +1,4 @@
-# 📈 Apex — Sales Performance Dashboard
+# 📈 AUSTON — Sales Performance Dashboard
 
 A real-time sales operations and pipeline intelligence dashboard built with **Streamlit** that pulls live data from Google Sheets (`ENQUIRIES` & `ORDERS` tabs).
 
