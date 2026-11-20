@@ -1,6 +1,6 @@
-# 📊 Apex — Sales & Service Operations Dashboard
+# 📊 AUSTON — Sales & Service Operations Dashboard
 
-A real-time business intelligence dashboard built with **Streamlit** that pulls live data from a Google Sheet to monitor sales pipelines, service operations, and engineer performance for Apex.
+A real-time business intelligence dashboard built with **Streamlit** that pulls live data from a Google Sheet to monitor sales pipelines, service operations, and engineer performance for AUSTON.
 
 ---
 
@@ -131,4 +131,4 @@ Sales_Dashboard_KPIs/
 
 ## 📄 License
 
-This project is proprietary to **Apex**. All rights reserved.
+This project is proprietary to **AUSTON**. All rights reserved.
