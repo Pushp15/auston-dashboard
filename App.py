@@ -235,7 +235,7 @@ with col_sv1:
             "OPEN ISSUES": o_iss,
             "RESOLVED ISSUES": r_iss
         })
-    st.dataframe(pd.DataFrame(serv_eng_data), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(serv_eng_data), width="stretch", hide_index=True)
 
 with col_sv2:
     st.subheader("⚠️ ISSUES BY PRIORITY MATRIX")
@@ -255,6 +255,6 @@ st.markdown("---")
 
 st.subheader("📋 ALL CUSTOMER ISSUES LOG")
 if not df_issues_f.empty:
-    st.dataframe(df_issues_f, use_container_width=True, hide_index=True)
+    st.dataframe(df_issues_f, width="stretch", hide_index=True)
 else:
     st.info("NO CUSTOMER ISSUES DATA AVAILABLE.")
