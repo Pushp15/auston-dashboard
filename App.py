@@ -16,13 +16,35 @@ st.set_page_config(
     layout="wide"
 )
 
-# CUSTOM CSS FOR ALL-CAPS TYPOGRAPHY
+# CUSTOM CSS FOR ALL-CAPS TYPOGRAPHY & COMPACT HEADER
 st.markdown("""
     <style>
+    /* Reduce top whitespace of the page */
+    .block-container {
+        padding-top: 1.2rem !important;
+        padding-bottom: 2rem !important;
+    }
     html, body, [class*="css"] {
         font-weight: 600 !important;
         color: #111827 !important;
         text-transform: uppercase !important;
+    }
+    .header-title {
+        font-size: 1.35rem !important;
+        font-weight: 800 !important;
+        color: #0F172A !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.2 !important;
+        text-transform: uppercase !important;
+    }
+    .header-caption {
+        font-size: 0.75rem !important;
+        color: #64748B !important;
+        font-weight: 600 !important;
+        margin-top: 2px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.03em !important;
     }
     [data-testid="stMetricLabel"] {
         font-weight: 700 !important;
@@ -39,6 +61,10 @@ st.markdown("""
         font-weight: 800 !important;
         color: #0F172A !important;
         text-transform: uppercase !important;
+    }
+    hr {
+        margin-top: 0.6rem !important;
+        margin-bottom: 0.8rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -152,27 +178,23 @@ def apply_filters(df):
 df_issues_f = apply_filters(df_issues)
 df_visits_f = apply_filters(df_visits)
 
-# APP HEADER
+# COMPACT APP HEADER
 if logo_img:
-    col_logo, col_title, col_btn = st.columns([1, 6, 2])
+    col_logo, col_title, col_btn = st.columns([0.6, 6.5, 1.5])
     with col_logo:
-        st.image(logo_img, width=90)
+        st.image(logo_img, width=52)
     with col_title:
-        st.title("AUSTON — SERVICE OPERATIONS DASHBOARD")
-        st.caption("REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT")
+        st.markdown('<div class="header-title">AUSTON — SERVICE OPERATIONS DASHBOARD</div><div class="header-caption">REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT</div>', unsafe_allow_html=True)
     with col_btn:
-        st.write("")
-        if st.button("🔄 FORCE SYNC DATA"):
+        if st.button("🔄 FORCE SYNC"):
             st.cache_data.clear()
             st.rerun()
 else:
-    col_title, col_btn = st.columns([4, 1])
+    col_title, col_btn = st.columns([7, 1.5])
     with col_title:
-        st.title("AUSTON — SERVICE OPERATIONS DASHBOARD")
-        st.caption("REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT")
+        st.markdown('<div class="header-title">AUSTON — SERVICE OPERATIONS DASHBOARD</div><div class="header-caption">REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT</div>', unsafe_allow_html=True)
     with col_btn:
-        st.write("")
-        if st.button("🔄 FORCE SYNC DATA"):
+        if st.button("🔄 FORCE SYNC"):
             st.cache_data.clear()
             st.rerun()
 
