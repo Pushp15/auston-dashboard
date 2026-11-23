@@ -156,9 +156,6 @@ for df_temp in [df_issues, df_visits]:
             for e in df_temp['ENGINEER'].dropna():
                 clean_e = str(e).strip().upper()
                 if clean_e and clean_e not in ['NONE', 'NAN']:
-                    # Auto-correct known typos
-                    if clean_e == 'JGANNATHA':
-                        clean_e = 'JAGANNATHA'
                     all_engineers.add(clean_e)
         if 'PRODUCT' in df_temp.columns:
             for p in df_temp['PRODUCT'].dropna():
@@ -181,8 +178,7 @@ def apply_filters(df):
         return df
     filtered_df = df.copy()
     if selected_engineer != "ALL" and 'ENGINEER' in filtered_df.columns:
-        # Standardize engineer matching (including typo fix)
-        eng_series = filtered_df['ENGINEER'].astype(str).str.strip().str.upper().replace({'JGANNATHA': 'JAGANNATHA'})
+        eng_series = filtered_df['ENGINEER'].astype(str).str.strip().str.upper()
         filtered_df = filtered_df[eng_series == selected_engineer]
     if selected_product != "ALL" and 'PRODUCT' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df['PRODUCT'].astype(str).str.strip().str.upper() == selected_product]
@@ -236,8 +232,8 @@ with col_sv1:
     st.subheader("👨‍🔧 SERVICE ENGINEER METRICS")
     serv_eng_data = []
     for eng in (engineers_sorted if engineers_sorted else ["NO ENGINEERS FOUND"]):
-        eng_issues = df_issues_f[df_issues_f['ENGINEER'].astype(str).str.strip().str.upper().replace({'JGANNATHA': 'JAGANNATHA'}) == eng] if 'ENGINEER' in df_issues_f.columns else pd.DataFrame()
-        vis_cnt = len(df_visits_f[df_visits_f['ENGINEER'].astype(str).str.strip().str.upper().replace({'JGANNATHA': 'JAGANNATHA'}) == eng]) if 'ENGINEER' in df_visits_f.columns else 0
+        eng_issues = df_issues_f[df_issues_f['ENGINEER'].astype(str).str.strip().str.upper() == eng] if 'ENGINEER' in df_issues_f.columns else pd.DataFrame()
+        vis_cnt = len(df_visits_f[df_visits_f['ENGINEER'].astype(str).str.strip().str.upper() == eng]) if 'ENGINEER' in df_visits_f.columns else 0
         o_iss = len(eng_issues[~eng_issues['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED'])]) if not eng_issues.empty and 'CURRENT STATUS' in eng_issues.columns else 0
         r_iss = len(eng_issues[eng_issues['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED'])]) if not eng_issues.empty and 'CURRENT STATUS' in eng_issues.columns else 0
 
