@@ -173,6 +173,16 @@ st.sidebar.subheader("🎯 FILTERS")
 selected_engineer = st.sidebar.selectbox("FILTER BY ENGINEER", ["ALL"] + engineers_sorted)
 selected_product = st.sidebar.selectbox("FILTER BY PRODUCT", ["ALL"] + products_sorted)
 
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    """
+    <div style="text-align: center; font-size: 0.75rem; color: #64748B; font-weight: 700; letter-spacing: 0.05em; padding: 0.5rem 0;">
+        ⚡ POWERED BY <span style="color: #4F46E5;">KOGNIVAI</span>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 def apply_filters(df):
     if df.empty:
         return df
@@ -193,7 +203,7 @@ if logo_img:
     with col_logo:
         st.image(logo_img, width=52)
     with col_title:
-        st.markdown('<div class="header-title">AUSTON — SERVICE OPERATIONS DASHBOARD</div><div class="header-caption">REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT</div>', unsafe_allow_html=True)
+        st.markdown('<div class="header-title">AUSTON — SERVICE OPERATIONS DASHBOARD</div><div class="header-caption">REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT &nbsp;|&nbsp; POWERED BY <span style="color: #4F46E5; font-weight: 800;">KOGNIVAI</span></div>', unsafe_allow_html=True)
     with col_btn:
         if st.button("🔄 FORCE SYNC"):
             st.cache_data.clear()
@@ -201,7 +211,7 @@ if logo_img:
 else:
     col_title, col_btn = st.columns([7, 1.5])
     with col_title:
-        st.markdown('<div class="header-title">AUSTON — SERVICE OPERATIONS DASHBOARD</div><div class="header-caption">REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT</div>', unsafe_allow_html=True)
+        st.markdown('<div class="header-title">AUSTON — SERVICE OPERATIONS DASHBOARD</div><div class="header-caption">REAL-TIME TICKET TRACKING & FIELD SERVICE MANAGEMENT &nbsp;|&nbsp; POWERED BY <span style="color: #4F46E5; font-weight: 800;">KOGNIVAI</span></div>', unsafe_allow_html=True)
     with col_btn:
         if st.button("🔄 FORCE SYNC"):
             st.cache_data.clear()
