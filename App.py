@@ -153,12 +153,18 @@ all_products = set()
 for df_temp in [df_enquiries, df_orders]:
     if not df_temp.empty:
         if 'ENGINEER' in df_temp.columns:
-            all_engineers.update(df_temp['ENGINEER'].dropna().unique())
+            for e in df_temp['ENGINEER'].dropna():
+                clean_e = str(e).strip().upper()
+                if clean_e and clean_e not in ['NONE', 'NAN']:
+                    all_engineers.add(clean_e)
         if 'PRODUCT' in df_temp.columns:
-            all_products.update(df_temp['PRODUCT'].dropna().unique())
+            for p in df_temp['PRODUCT'].dropna():
+                clean_p = str(p).strip().upper()
+                if clean_p and clean_p not in ['NONE', 'NAN']:
+                    all_products.add(clean_p)
 
-engineers_sorted = sorted([str(e).upper() for e in all_engineers if str(e).strip() != ""])
-products_sorted = sorted([str(p).upper() for p in all_products if str(p).strip() != ""])
+engineers_sorted = sorted(list(all_engineers))
+products_sorted = sorted(list(all_products))
 
 # SIDEBAR FILTERS
 st.sidebar.markdown("---")
@@ -172,9 +178,9 @@ def apply_filters(df):
         return df
     filtered_df = df.copy()
     if selected_engineer != "ALL" and 'ENGINEER' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['ENGINEER'].astype(str).str.upper() == selected_engineer]
+        filtered_df = filtered_df[filtered_df['ENGINEER'].astype(str).str.strip().str.upper() == selected_engineer]
     if selected_product != "ALL" and 'PRODUCT' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['PRODUCT'].astype(str).str.upper() == selected_product]
+        filtered_df = filtered_df[filtered_df['PRODUCT'].astype(str).str.strip().str.upper() == selected_product]
     return filtered_df
 
 df_enquiries_f = apply_filters(df_enquiries)
@@ -229,8 +235,8 @@ with col_s1:
     st.subheader("👨‍🔧 SALES ENGINEER ACTIVITY")
     sales_eng_data = []
     for eng in (engineers_sorted if engineers_sorted else ["NO ENGINEERS FOUND"]):
-        e_enq = len(df_enquiries_f[df_enquiries_f['ENGINEER'].astype(str).str.upper() == eng]) if 'ENGINEER' in df_enquiries_f.columns else 0
-        e_ord = len(df_orders_f[df_orders_f['ENGINEER'].astype(str).str.upper() == eng]) if 'ENGINEER' in df_orders_f.columns else 0
+        e_enq = len(df_enquiries_f[df_enquiries_f['ENGINEER'].astype(str).str.strip().str.upper() == eng]) if 'ENGINEER' in df_enquiries_f.columns else 0
+        e_ord = len(df_orders_f[df_orders_f['ENGINEER'].astype(str).str.strip().str.upper() == eng]) if 'ENGINEER' in df_orders_f.columns else 0
         sales_eng_data.append({
             "ENGINEER": eng,
             "ENQUIRIES LOGGED": e_enq,
