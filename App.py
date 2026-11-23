@@ -219,18 +219,34 @@ skpi4.metric("VISITS COMPLETED", completed_visits)
 
 st.markdown("---")
 
-col_sv1, col_sv2 = st.columns([1, 1])
+col_sv1, col_sv2 = st.columns([1.4, 1])
 
 with col_sv1:
     st.subheader("👨‍🔧 SERVICE ENGINEER METRICS")
     serv_eng_data = []
     for eng in (engineers_sorted if engineers_sorted else ["NO ENGINEERS FOUND"]):
+        eng_issues = df_issues_f[df_issues_f['ENGINEER'].astype(str).str.upper() == eng] if 'ENGINEER' in df_issues_f.columns else pd.DataFrame()
         vis_cnt = len(df_visits_f[df_visits_f['ENGINEER'].astype(str).str.upper() == eng]) if 'ENGINEER' in df_visits_f.columns else 0
-        o_iss = len(df_issues_f[(df_issues_f['ENGINEER'].astype(str).str.upper() == eng) & (~df_issues_f['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED']))]) if 'ENGINEER' in df_issues_f.columns and 'CURRENT STATUS' in df_issues_f.columns else 0
-        r_iss = len(df_issues_f[(df_issues_f['ENGINEER'].astype(str).str.upper() == eng) & (df_issues_f['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED']))]) if 'ENGINEER' in df_issues_f.columns and 'CURRENT STATUS' in df_issues_f.columns else 0
+        o_iss = len(eng_issues[~eng_issues['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED'])]) if not eng_issues.empty and 'CURRENT STATUS' in eng_issues.columns else 0
+        r_iss = len(eng_issues[eng_issues['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED'])]) if not eng_issues.empty and 'CURRENT STATUS' in eng_issues.columns else 0
+
+        # Extract assigned customers & issues
+        if not eng_issues.empty and 'CUSTOMER' in eng_issues.columns:
+            cust_list = [str(c).strip() for c in eng_issues['CUSTOMER'].dropna().unique() if str(c).strip() not in ['', 'None', 'nan']]
+            cust_str = ", ".join(cust_list) if cust_list else "-"
+        else:
+            cust_str = "-"
+
+        if not eng_issues.empty and 'CUSTOMER ISSUE' in eng_issues.columns:
+            issue_list = [str(i).strip() for i in eng_issues['CUSTOMER ISSUE'].dropna().unique() if str(i).strip() not in ['', 'None', 'nan']]
+            issue_str = "; ".join(issue_list) if issue_list else "-"
+        else:
+            issue_str = "-"
 
         serv_eng_data.append({
             "ENGINEER": eng,
+            "CUSTOMER": cust_str,
+            "CUSTOMER ISSUES": issue_str,
             "VISITS COMPLETED": vis_cnt,
             "OPEN ISSUES": o_iss,
             "RESOLVED ISSUES": r_iss
