@@ -155,12 +155,20 @@ all_products = set()
 for df_temp in [df_enquiries, df_issues, df_visits, df_orders]:
     if not df_temp.empty:
         if 'ENGINEER' in df_temp.columns:
-            all_engineers.update(df_temp['ENGINEER'].dropna().unique())
+            for e in df_temp['ENGINEER'].dropna():
+                clean_e = str(e).strip().upper()
+                if clean_e and clean_e not in ['NONE', 'NAN']:
+                    if clean_e == 'JGANNATHA':
+                        clean_e = 'JAGANNATHA'
+                    all_engineers.add(clean_e)
         if 'PRODUCT' in df_temp.columns:
-            all_products.update(df_temp['PRODUCT'].dropna().unique())
+            for p in df_temp['PRODUCT'].dropna():
+                clean_p = str(p).strip().upper()
+                if clean_p and clean_p not in ['NONE', 'NAN']:
+                    all_products.add(clean_p)
 
-engineers_sorted = sorted([str(e).upper() for e in all_engineers if str(e).strip() != ""])
-products_sorted = sorted([str(p).upper() for p in all_products if str(p).strip() != ""])
+engineers_sorted = sorted(list(all_engineers))
+products_sorted = sorted(list(all_products))
 
 # SIDEBAR FILTERS
 st.sidebar.markdown("---")
@@ -174,9 +182,10 @@ def apply_filters(df):
         return df
     filtered_df = df.copy()
     if selected_engineer != "ALL" and 'ENGINEER' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['ENGINEER'].astype(str).str.upper() == selected_engineer]
+        eng_series = filtered_df['ENGINEER'].astype(str).str.strip().str.upper().replace({'JGANNATHA': 'JAGANNATHA'})
+        filtered_df = filtered_df[eng_series == selected_engineer]
     if selected_product != "ALL" and 'PRODUCT' in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df['PRODUCT'].astype(str).str.upper() == selected_product]
+        filtered_df = filtered_df[filtered_df['PRODUCT'].astype(str).str.strip().str.upper() == selected_product]
     return filtered_df
 
 df_enquiries_f = apply_filters(df_enquiries)
@@ -309,8 +318,8 @@ with tab_service:
         st.subheader("👨‍🔧 SERVICE ENGINEER METRICS")
         serv_eng_data = []
         for eng in (engineers_sorted if engineers_sorted else ["NO ENGINEERS FOUND"]):
-            eng_issues = df_issues_f[df_issues_f['ENGINEER'].astype(str).str.upper() == eng] if 'ENGINEER' in df_issues_f.columns else pd.DataFrame()
-            vis_cnt = len(df_visits_f[df_visits_f['ENGINEER'].astype(str).str.upper() == eng]) if 'ENGINEER' in df_visits_f.columns else 0
+            eng_issues = df_issues_f[df_issues_f['ENGINEER'].astype(str).str.strip().str.upper().replace({'JGANNATHA': 'JAGANNATHA'}) == eng] if 'ENGINEER' in df_issues_f.columns else pd.DataFrame()
+            vis_cnt = len(df_visits_f[df_visits_f['ENGINEER'].astype(str).str.strip().str.upper().replace({'JGANNATHA': 'JAGANNATHA'}) == eng]) if 'ENGINEER' in df_visits_f.columns else 0
             o_iss = len(eng_issues[~eng_issues['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED'])]) if not eng_issues.empty and 'CURRENT STATUS' in eng_issues.columns else 0
             r_iss = len(eng_issues[eng_issues['CURRENT STATUS'].astype(str).str.upper().isin(['RESOLVED', 'CLOSED'])]) if not eng_issues.empty and 'CURRENT STATUS' in eng_issues.columns else 0
 
