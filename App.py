@@ -78,7 +78,7 @@ st.markdown("""
 try:
     SPREADSHEET_ID = st.secrets["SPREADSHEET_ID"]
 except (KeyError, FileNotFoundError):
-    SPREADSHEET_ID = "1BFFZWBHa35gZzQgTpP2NNIsMmYr06eWAb6jsXQJ1LVg"
+    SPREADSHEET_ID = "1fv9efrvodTUvzTszEZ1KyvERIl9vcgnQasJY40JiSTY"
 
 # ─────────────────────────────────────────────────────────────
 # SIDEBAR CONTROLS
