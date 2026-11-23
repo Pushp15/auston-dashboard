@@ -138,10 +138,9 @@ def load_data(sheet_name: str) -> pd.DataFrame:
 
 # LOAD SALES SHEETS
 df_enquiries = load_data("ENQUIRIES")
-df_orders = load_data("ORDERS")
 
 # IF SHEETS RETURN EMPTY, WARN USER
-if df_enquiries.empty and df_orders.empty:
+if df_enquiries.empty:
     st.error("⚠️ COULD NOT LOAD SALES DATA FROM GOOGLE SHEET.")
     st.info("Please verify that your Google Sheet link sharing is set to 'Anyone with the link can view'.")
     st.stop()
@@ -150,7 +149,7 @@ if df_enquiries.empty and df_orders.empty:
 all_engineers = set()
 all_products = set()
 
-for df_temp in [df_enquiries, df_orders]:
+for df_temp in [df_enquiries]:
     if not df_temp.empty:
         if 'ENGINEER' in df_temp.columns:
             for e in df_temp['ENGINEER'].dropna():
@@ -184,7 +183,6 @@ def apply_filters(df):
     return filtered_df
 
 df_enquiries_f = apply_filters(df_enquiries)
-df_orders_f = apply_filters(df_orders)
 
 # COMPACT APP HEADER
 if logo_img:
@@ -209,13 +207,12 @@ else:
 st.markdown("---")
 
 # SALES KPIS
-kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
+kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
 
 tot_enq = len(df_enquiries_f) if not df_enquiries_f.empty else 0
 open_enq = len(df_enquiries_f[~df_enquiries_f['ENQUIRY STATUS'].astype(str).str.upper().isin(['WON', 'LOST'])]) if not df_enquiries_f.empty and 'ENQUIRY STATUS' in df_enquiries_f.columns else 0
 quotes_sent = len(df_enquiries_f[df_enquiries_f['QUOTATION STATUS'].astype(str).str.upper().isin(['SUBMITTED', 'ACCEPTED', 'REVISED'])]) if not df_enquiries_f.empty and 'QUOTATION STATUS' in df_enquiries_f.columns else 0
 exp_orders = len(df_enquiries_f[df_enquiries_f['EXPECTED ORDER'].astype(str).str.upper() == 'YES']) if not df_enquiries_f.empty and 'EXPECTED ORDER' in df_enquiries_f.columns else 0
-orders_rec = len(df_orders_f) if not df_orders_f.empty else 0
 
 today = pd.to_datetime(datetime.now().date())
 overdue_fu = len(df_enquiries_f[df_enquiries_f['NEXT FOLLOW-UP'] < today]) if not df_enquiries_f.empty and 'NEXT FOLLOW-UP' in df_enquiries_f.columns else 0
@@ -224,8 +221,7 @@ kpi1.metric("TOTAL ENQUIRIES", tot_enq)
 kpi2.metric("OPEN ENQUIRIES", open_enq)
 kpi3.metric("QUOTES SENT", quotes_sent)
 kpi4.metric("EXP. ORDERS", exp_orders)
-kpi5.metric("ORDERS RECEIVED", orders_rec)
-kpi6.metric("OVERDUE FOLLOW-UPS", overdue_fu)
+kpi5.metric("OVERDUE FOLLOW-UPS", overdue_fu)
 
 st.markdown("---")
 
@@ -236,11 +232,9 @@ with col_s1:
     sales_eng_data = []
     for eng in (engineers_sorted if engineers_sorted else ["NO ENGINEERS FOUND"]):
         e_enq = len(df_enquiries_f[df_enquiries_f['ENGINEER'].astype(str).str.strip().str.upper() == eng]) if 'ENGINEER' in df_enquiries_f.columns else 0
-        e_ord = len(df_orders_f[df_orders_f['ENGINEER'].astype(str).str.strip().str.upper() == eng]) if 'ENGINEER' in df_orders_f.columns else 0
         sales_eng_data.append({
             "ENGINEER": eng,
-            "ENQUIRIES LOGGED": e_enq,
-            "ORDERS CLOSED": e_ord
+            "ENQUIRIES LOGGED": e_enq
         })
     st.dataframe(pd.DataFrame(sales_eng_data), width="stretch", hide_index=True)
 
@@ -248,8 +242,7 @@ with col_s1:
     prod_sales_data = []
     for prod in (products_sorted if products_sorted else ["NO PRODUCTS FOUND"]):
         p_enq = len(df_enquiries_f[df_enquiries_f['PRODUCT'].astype(str).str.upper() == prod]) if 'PRODUCT' in df_enquiries_f.columns else 0
-        p_ord = len(df_orders_f[df_orders_f['PRODUCT'].astype(str).str.upper() == prod]) if 'PRODUCT' in df_orders_f.columns else 0
-        prod_sales_data.append({"PRODUCT": prod, "ENQUIRIES": p_enq, "ORDERS": p_ord})
+        prod_sales_data.append({"PRODUCT": prod, "ENQUIRIES": p_enq})
     st.dataframe(pd.DataFrame(prod_sales_data), width="stretch", hide_index=True)
 
 with col_s2:
